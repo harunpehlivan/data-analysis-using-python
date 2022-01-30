@@ -305,13 +305,12 @@ df["postalCode"].isnull().value_counts()
 
 # creating folder structure as per brand of vehicle
 fileName = abs_path + "/ShellScripts/CreateFolder.sh"
-file = open(fileName, "w+")
-baseString = "mkdir -p " + abs_path + "/CleanData/DataForAnalysis/"
-for b in list(t["brand"].unique()):
-    newString = baseString + b + "\n"
-    file.write(newString)
-file.write("mkdir -p " + abs_path + "/CleanData/CleanedDataSet")
-file.close()
+with open(fileName, "w+") as file:
+    baseString = "mkdir -p " + abs_path + "/CleanData/DataForAnalysis/"
+    for b in list(t["brand"].unique()):
+        newString = baseString + b + "\n"
+        file.write(newString)
+    file.write("mkdir -p " + abs_path + "/CleanData/CleanedDataSet")
 st = os.stat(fileName)
 os.chmod(fileName, st.st_mode | stat.S_IEXEC)
 subprocess.call(fileName,shell=True)
@@ -328,14 +327,13 @@ df.to_csv(path_to_file,index=False)
 
 # splitting the the records based on brand and vehicleType
 fileName = abs_path + "/ShellScripts/CreateFiles.sh"
-file = open(fileName, "w+")
-baseString_before = '''awk 'BEGIN{FS=OFS=","} FNR == 1 {print} '''
-baseString_after = " {print}' " + abs_path + "/CleanData/CleanedDataSet/cleaned_autos.csv" + " >> " + abs_path + "/CleanData/DataForAnalysis/"
-for b in list(df["brand"].unique()):
-    for typ in list(df[df["brand"] == b]["vehicleType"].unique()):
-        newString = baseString_before + '$15 == ' + '"' + b + '"' + ' && $7 == ' + '"' + typ + '"' + baseString_after + b + "/" + b + "_" + typ + ".csv" + "\n"
-        file.write(newString)
-file.close()
+with open(fileName, "w+") as file:
+    baseString_before = '''awk 'BEGIN{FS=OFS=","} FNR == 1 {print} '''
+    baseString_after = " {print}' " + abs_path + "/CleanData/CleanedDataSet/cleaned_autos.csv" + " >> " + abs_path + "/CleanData/DataForAnalysis/"
+    for b in list(df["brand"].unique()):
+        for typ in list(df[df["brand"] == b]["vehicleType"].unique()):
+            newString = baseString_before + '$15 == ' + '"' + b + '"' + ' && $7 == ' + '"' + typ + '"' + baseString_after + b + "/" + b + "_" + typ + ".csv" + "\n"
+            file.write(newString)
 st = os.stat(fileName)
 os.chmod(fileName, st.st_mode | stat.S_IEXEC)
 subprocess.call(fileName,shell=True)
